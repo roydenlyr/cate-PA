@@ -6,7 +6,7 @@ from speechmatics.tts import AsyncClient, Voice, OutputFormat
 async def main():
     # Connect to the ESP32 server
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('127.0.0.1', 8080))
+    client_socket.connect(('192.168.0.133', 8080))
 
     async with AsyncClient() as client:
         async with await client.generate(
