@@ -8,7 +8,7 @@ WATCH_FOLDER = '/home/cate/audio_inbox'
 # To be change upon deployment
 
 PEERS = {
-    'FS1': '192.168.0.133',
-    'FS2': '192.168.0.134',
-    'FS3': '192.168.0.135',
+    'FS1': ('192.168.0.133', 8080),
+    'FS2': ('192.168.0.161', 8081),  # For testing, FS2 is the same machine
+    'FS3': ('192.168.0.161', 8082),  # For testing, FS3 is the same machine
 }
