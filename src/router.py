@@ -10,13 +10,10 @@ class Router:
         self.sender = AudioSender()
 
     def _parse_target(self, filepath):
-        """Extract target prefix from filename. E.g. 'S1_announcement.wav' -> 'S1'"""
+        """Extract target from filename. E.g. 'S1.wav' -> 'S1', 'Broadcast.wav' -> 'BROADCAST'"""
         filename = os.path.basename(filepath)
-        parts = filename.split('_', 1)
-        if len(parts) < 2:
-            print(f"Invalid filename format: {filename}. Expected <target>_<name>.wav")
-            return None
-        return parts[0].upper()
+        target = os.path.splitext(filename)[0].upper()
+        return target
 
     def _play_local(self, filepath):
         """Play WAV file through 3.5mm jack using aplay."""
@@ -40,23 +37,16 @@ class Router:
 
         print(f"Routing {os.path.basename(filepath)} -> target: {target}")
 
-        if target == 'LOCAL':
-            # Play on own station only
-            self._play_local(filepath)
-
-        elif target == 'ALL':
-            # Play locally and send to all other stations
+        if target == 'BROADCAST':
             self._play_local(filepath)
             for station_id in PEERS:
                 if station_id != STATION_ID:
                     self._send_to_station(station_id, filepath)
 
         elif target == STATION_ID:
-            # Addressed to own station, play locally
             self._play_local(filepath)
 
         elif target in PEERS:
-            # Addressed to another station, send to it
             self._send_to_station(target, filepath)
 
         else:
