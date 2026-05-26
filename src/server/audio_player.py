@@ -1,17 +1,18 @@
-import pyaudio
-
+import subprocess
 class AudioPlayer:
     def __init__(self, channels, sample_rate, bits_per_sample):
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(format=self.p.get_format_from_width(bits_per_sample // 8),
-                                  channels=channels,
-                                  rate=sample_rate,
-                                  output=True)
+        format_map = {8: 'U8', 16: 'S16_LE', 24: 'S24_LE', 32: 'S32_LE'}
+        self.process = subprocess.Popen(
+            ['aplay', '-f', format_map[bits_per_sample],
+             '-r', str(sample_rate),
+             '-c', str(channels),
+             '-'],
+            stdin=subprocess.PIPE
+        )
 
     def play(self, data):
-        self.stream.write(data)
-    
+        self.process.stdin.write(data)
+
     def close(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.p.terminate()
+        self.process.stdin.close()
+        self.process.wait()

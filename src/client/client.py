@@ -10,7 +10,7 @@ bytes_per_second = wf.getframerate() * wf.getsampwidth() * wf.getnchannels()
 chunk_duration = (chunk * wf.getsampwidth()) / bytes_per_second
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('localhost', 8080))
+client_socket.connect(('192.168.0.133', 8080))
 
 
 with open(filename, 'rb') as f:
