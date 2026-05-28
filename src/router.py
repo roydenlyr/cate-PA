@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from config import STATION_ID, PEERS
+from config import STATION_ID, STATIONS
 from sender import AudioSender
 
 
@@ -24,10 +24,10 @@ class Router:
 
     def _send_to_station(self, station_id, filepath):
         """Send WAV file to a specific station."""
-        if station_id not in PEERS:
+        if station_id not in STATIONS:
             print(f"Unknown station: {station_id}")
             return
-        self.sender.send_file(PEERS[station_id], filepath)
+        self.sender.send_file(STATIONS[station_id], filepath)
 
     def handle_file(self, filepath):
         """Main routing logic. Called by FileWatcher when a new file appears."""
@@ -39,14 +39,14 @@ class Router:
 
         if target == 'BROADCAST':
             self._play_local(filepath)
-            for station_id in PEERS:
+            for station_id in STATIONS:
                 if station_id != STATION_ID:
                     self._send_to_station(station_id, filepath)
 
         elif target == STATION_ID:
             self._play_local(filepath)
 
-        elif target in PEERS:
+        elif target in STATIONS:
             self._send_to_station(target, filepath)
 
         else:

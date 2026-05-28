@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 
-from config import CHUNK_SIZE
+from config import CHUNK_SIZE, NUMBER_OF_STATIONS
 from wav_parser import parse_wav_header, read_header
 from audio_player import AudioPlayer
 
@@ -15,7 +15,7 @@ class AudioServer:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((self.ip_address, self.tcp_port))
-        self.s.listen(3)
+        self.s.listen(NUMBER_OF_STATIONS)
 
         try:
             while True:
