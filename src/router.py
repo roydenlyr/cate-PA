@@ -1,5 +1,6 @@
 import os
 import subprocess
+import threading
 
 from config import STATION_ID, STATIONS
 from sender import AudioSender
@@ -38,10 +39,16 @@ class Router:
         print(f"Routing {os.path.basename(filepath)} -> target: {target}")
 
         if target == 'BROADCAST':
-            self._play_local(filepath)
+            threads = []
+            threads.append(threading.Thread(target=self._play_local, args=(filepath,)))
             for station_id in STATIONS:
                 if station_id != STATION_ID:
-                    self._send_to_station(station_id, filepath)
+                    threads.append(threading.Thread(target=self._send_to_station, args=(station_id, filepath)))
+            
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
 
         elif target == STATION_ID:
             self._play_local(filepath)
