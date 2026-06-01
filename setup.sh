@@ -25,7 +25,7 @@ if [ -z "$CARD_NUM" ]; then
     CARD_NUM=0
 fi
 
-echo "Detected heaphone card: $CARD_NUM"
+echo "Detected headphone card: $CARD_NUM"
 sudo bash -c "cat > /etc/asound.conf << EOF
 defaults.pcm.card $CARD_NUM
 defaults.ctl.card $CARD_NUM
@@ -48,7 +48,7 @@ if ! grep -q "\[audio_inbox\]" /etc/samba/smb.conf; then
     guest ok = yes
     create mask = 0777
 EOF"
-    echo "Sanba share added"
+    echo "Samba share added"
 else
     echo "Samba share already configured, skipping."
 fi
