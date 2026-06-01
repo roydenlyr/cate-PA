@@ -33,9 +33,10 @@ class Router:
 
     def handle_file(self, filepath):
         """Main routing logic. Called by FileWatcher when a new file appears."""
-        if not is_valid_wav(open(filepath, 'rb').read(44)):
-            print(f"Invalid WAV file: {os.path.basename(filepath)}, skipping.")
-            return
+        with open(filepath, 'rb') as f:
+            if not is_valid_wav(f.read(44)):
+                print(f"Invalid WAV file: {os.path.basename(filepath)}, skipping.")
+                return
 
         target = self._parse_target(filepath)
         if target is None:
