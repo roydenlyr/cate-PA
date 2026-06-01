@@ -6,8 +6,11 @@ def read_header(client_socket):
         header += client_socket.recv(44 - len(header))
     return header
 
+def is_valid_wav(header_bytes):
+    return header_bytes[0:4] == b'RIFF' and header_bytes[8:12] == b'WAVE'
+
 def parse_wav_header(header_bytes):
-    if header_bytes[0:4] != b'RIFF' or header_bytes[8:12] != b'WAVE':
+    if not is_valid_wav(header_bytes):
         raise ValueError("Not a valid WAV file")
     
     

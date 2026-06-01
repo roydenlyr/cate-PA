@@ -4,6 +4,7 @@ import threading
 
 from config import STATION_ID, STATIONS
 from sender import AudioSender
+from wav_parser import is_valid_wav
 
 
 class Router:
@@ -32,6 +33,10 @@ class Router:
 
     def handle_file(self, filepath):
         """Main routing logic. Called by FileWatcher when a new file appears."""
+        if not is_valid_wav(open(filepath, 'rb').read(44)):
+            print(f"Invalid WAV file: {os.path.basename(filepath)}, skipping.")
+            return
+
         target = self._parse_target(filepath)
         if target is None:
             return

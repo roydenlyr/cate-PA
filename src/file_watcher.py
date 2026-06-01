@@ -14,8 +14,10 @@ class FileWatcher:
         try:
             initial_size = os.path.getsize(file_path)
             time.sleep(1)  # Wait a bit before checking again
+            interim_size = os.path.getsize(file_path)
+            time.sleep(1)  # Wait a bit more to ensure file is not changing
             final_size = os.path.getsize(file_path)
-            return initial_size == final_size and initial_size > 0
+            return initial_size == interim_size == final_size and initial_size > 0
         except OSError:
             return False
         
