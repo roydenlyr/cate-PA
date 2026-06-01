@@ -100,7 +100,7 @@ sudo systemctl enable "${SERVICE_NAME}.service"
 # ---- Test audio ----
 echo ""
 echo "Testing audio output on card $CARD_NUM..."
-if aplay -l | grep -qi headphones: then
+if aplay -l | grep -qi headphones; then
     speaker-test -c 1 -t sine -l 1 -p 1 2>/dev/null && echo "Audio test passed." || echo "Audio test failed. Check connections."
 else
     echo "Skipping audio test - no headphones device found."
