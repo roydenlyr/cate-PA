@@ -11,5 +11,5 @@ NUMBER_OF_STATIONS = 3
 STATIONS = {
     'FS1': ('cate-PA-FS1.local', TCP_PORT),
     'FS2': ('cate-PA-FS2.local', TCP_PORT),
-    'FS3': ('cate-PA-WS.local', TCP_PORT),
+    'WS': ('cate-PA-WS.local', TCP_PORT),
 }
