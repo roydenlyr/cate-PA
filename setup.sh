@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_DIR="/home/cate/Desktop/cate-PA"
+PROJECT_DIR="/home/cate/cate-PA"
 AUDIO_INBOX="/home/cate/audio_inbox"
 SERVICE_NAME="pa-audio"
 REPO_URL="https://github.com/roydenlyr/cate-PA.git"
