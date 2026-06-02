@@ -13,7 +13,7 @@ class FileWatcher:
         """
         try:
             initial_size = os.path.getsize(file_path)
-            time.sleep(1)  # Wait a bit before checking again
+            time.sleep(3)  # Wait a bit before checking again
             final_size = os.path.getsize(file_path)
             return initial_size == final_size and initial_size > 0
         except OSError:
