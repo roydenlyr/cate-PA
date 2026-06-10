@@ -12,12 +12,16 @@ echo "PA Audio System - Setup"
 echo "========================================="
 
 # ---- System Packages ----
-echo "[1/6] Installing system packages..."
+echo "[1/7] Installing system packages..."
 sudo apt update -qq
-sudo apt install samba git -y -qq
+sudo apt install samba git vim -y -qq
+
+# ---- Enable VNC ----
+echo "[2/7] Enabling VNC server..."
+sudo raspi-config nonint do_vnc 0
 
 # ---- Auto-detect headphone audio card ----
-echo "[2/6] Configuring audio card..."
+echo "[3/7] Configuring audio card..."
 CARD_NUM=$(aplay -l 2>/dev/null | grep -i headphones | head -1 | sed 's/card \([0-9]\+\):.*/\1/')
 
 if [ -z "$CARD_NUM" ]; then
@@ -32,12 +36,12 @@ defaults.ctl.card $CARD_NUM
 EOF"
 
 # ---- Audio inbox folder ----
-echo "[3/6] Setting up audio inbox folder..."
+echo "[4/7] Setting up audio inbox folder..."
 mkdir -p "$AUDIO_INBOX"
 sudo chmod 777 "$AUDIO_INBOX"
 
 # ---- Samba config (only add if not already configured) ----
-echo "[4/6] Configuring Samba..."
+echo "[5/7] Configuring Samba..."
 if ! grep -q "\[audio_inbox\]" /etc/samba/smb.conf; then
     sudo bash -c "cat >> /etc/samba/smb.conf << EOF
 
@@ -63,7 +67,7 @@ sudo systemctl restart smbd
 sudo systemctl enable smbd
 
 # ---- Clone project repo ----
-echo "[5/6] Setting up project repository..."
+echo "[6/7] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
@@ -75,7 +79,7 @@ else
 fi
 
 # ---- Systemd service (only add if not already present) ----
-echo "[6/6] Setting up auto-start service..."
+echo "[7/7] Setting up auto-start service..."
 sudo bash -c "cat > /etc/systemd/system/${SERVICE_NAME}.service << EOF
 
 [Unit]
