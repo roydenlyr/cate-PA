@@ -51,7 +51,7 @@ Insert the microSD card into the Raspberry Pi and connect the power supply. Ther
 ---
 Before proceeding to the next steps, ensure Wi-Fi is connected.
 
-1. Open terminal (top left corner) and run this command:
+Open terminal (top left corner) and run this command:
 ```
 git clone https://github.com/roydenlyr/cate-PA.git
 cd cate-PA
@@ -77,13 +77,13 @@ To configure the Raspberry Pi, you will have to make changes to the configuratio
 1. From Desktop, open **Files** (top right corner).
 2. Open **cate-PA &rarr; src &rarr; ``config.py``**
 
-There are 7 variables within ``config.py``. You should only changes these 3 variables:
+There are 7 variables within ``config.py``. You should only change these 3 variables:
 - STATION_ID
 - NUMBER_OF_STATIONS
 - STATIONS
 
 ``STATION_ID`` refers to the station where the current Raspberry Pi will operate. It should follow the same abbreviation given in [hostname](#customisation).
-> Example: FS1 | FS2 | FS3 | WS. Do not include 'cate-PA'.
+> Example: Given hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA'
 
 ``NUMBER_OF_STATIONS`` refers to the total number of Raspberry Pi being deployed, including the one you are setting up right now. Update this value accordingly.
 
@@ -99,7 +99,7 @@ Add all existing stations accordingly.
 Once completed, press ``CTRL + S`` to save the file and close the window.
 
 ### Reboot
-The Raspberry Pi configuration and set up is complete. Reboot the system for all changes to take effect. To reboot:
+The Raspberry Pi configuration and set up is now complete. Reboot the system for all changes to take effect. To reboot:
 ```
 sudo reboot
 ```
