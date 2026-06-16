@@ -12,62 +12,55 @@ class Router:
         self.sender = AudioSender()
         self.playback_state = playback_state
 
-    def _parse_target(self, filepath):
-        """Extract target from filename. E.g. 'S1.wav' -> 'S1', 'Broadcast.wav' -> 'BROADCAST'"""
-        filename = os.path.basename(filepath)
-        target = os.path.splitext(filename)[0].upper()
-        return target
-
     def _play_local(self, filepath):
         """Play WAV file through 3.5mm jack using aplay."""
         if not self.playback_state.try_acquire():
-            print(f"Busy - cannot play {os.path.basename(filepath)} locally.")
-            return
+            return {'status': 'busy', 'message': f'{STATION_ID} is currently playing'}
 
         try:
             subprocess.run(['aplay', filepath], check=True)
         except Exception as e:
-            print(f"Local playback error: {e}")
+            return {'status': 'error', 'message': f'Local playback error: {e}'}
         finally:
             self.playback_state.release()
 
     def _send_to_station(self, station_id, filepath):
         """Send WAV file to a specific station."""
         if station_id not in STATIONS:
-            print(f"Unknown station: {station_id}")
-            return
-        self.sender.send_file(STATIONS[station_id], filepath)
+            return {'status': 'error', 'message': f'Unknown station: {station_id}'}
+        return self.sender.send_file(STATIONS[station_id], filepath)
 
-    def handle_file(self, filepath):
+    def handle_request(self, filepath, target):
         """Main routing logic. Called by FileWatcher when a new file appears."""
-        with open(filepath, 'rb') as f:
-            if not is_valid_wav(f.read(44)):
-                print(f"Invalid WAV file: {os.path.basename(filepath)}, skipping.")
-                return
-
-        target = self._parse_target(filepath)
-        if target is None:
-            return
-
         print(f"Routing {os.path.basename(filepath)} -> target: {target}")
 
         if target == 'BROADCAST':
             threads = []
-            threads.append(threading.Thread(target=self._play_local, args=(filepath,)))
+            results = {}
+
+            def play_local():
+                results['local'] = self._play_local(filepath)
+
+            def send_to(sid):
+                results[sid] = self._send_to_station(sid, filepath)
+
+            threads.append(threading.Thread(target=play_local))
             for station_id in STATIONS:
                 if station_id != STATION_ID:
-                    threads.append(threading.Thread(target=self._send_to_station, args=(station_id, filepath)))
+                    threads.append(threading.Thread(target=send_to, args=(station_id,)))
             
             for t in threads:
                 t.start()
             for t in threads:
                 t.join()
 
+            return {'status': 'ok', 'message': 'Broadcast complete', 'details': results}
+
         elif target == STATION_ID:
-            self._play_local(filepath)
+            return self._play_local(filepath)
 
         elif target in STATIONS:
-            self._send_to_station(target, filepath)
+            return self._send_to_station(target, filepath)
 
         else:
-            print(f"Unknown target: {target}")
+            return {'status': 'error', 'message': f'Unknown target: {target}'}

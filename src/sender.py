@@ -13,9 +13,8 @@ class AudioSender:
 
             response = s.recv(1)
             if response != OK_MESSAGE:
-                print(f"Target {target_ip} is busy. Rejecting audio transmission...")
                 s.close()
-                return
+                return {'status': 'busy', 'message': f'Target {target_ip} is busy'}
 
             with open(filepath, 'rb') as f:
                 header = f.read(44)
@@ -29,6 +28,6 @@ class AudioSender:
 
             time.sleep(0.5)
             s.close()
-            print(f"File '{filepath}' sent successfully to {target_ip}")
+            return {'status': 'ok', 'message': f'Sent to {target_ip}'}
         except Exception as e:
-            print(f"Error sending file '{filepath}' to {target_ip}: - {e}")
+            return {'status': 'error', 'message': f'Failed to send to {target_ip}: {e}'}
