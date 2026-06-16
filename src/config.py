@@ -1,25 +1,21 @@
-# DO NOT TOUCH THESE VARIABLES:
-#   TCP_PORT
-#   IP_ADDRESS
-#   CHUNK_SIZE
-#   WATCH_FOLDER
+import socket
+import json
+import os
 
+# Fixed - never change
 TCP_PORT = 8080
 IP_ADDRESS = '0.0.0.0'
 CHUNK_SIZE = 32768
 WATCH_FOLDER = '/home/cate/audio_inbox'
 
-# To be configured for each station before deployment
+# Auto-detected from hostname
+hostname = socket.gethostname()
+STATION_ID = hostname.split('-')[-1].upper()  # Extract station ID from hostname (e.g., 'FS1', 'WS')
 
-STATION_ID = 'FS1'
-NUMBER_OF_STATIONS = 3
+# Loaded from master file
+config_path = os.path.join(os.path.dirname(__file__), 'stations.json')
+with open(config_path, 'r') as f:
+    station_ips = json.load(f)
 
-
-# To be change upon deployment
-
-STATIONS = {
-    'FS1': ('128.127.1.50', TCP_PORT),
-    'FS2': ('128.127.2.50', TCP_PORT),
-    'FS3': ('128.127.3.50', TCP_PORT),
-    'WS': ('128.127.4.50', TCP_PORT),
-}
+STATIONS = {sid: (ip, TCP_PORT) for sid, ip in station_ips.items()}
+NUMBER_OF_STATIONS = len(STATIONS)
