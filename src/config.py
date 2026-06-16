@@ -7,6 +7,8 @@ TCP_PORT = 8080
 IP_ADDRESS = '0.0.0.0'
 CHUNK_SIZE = 32768
 WATCH_FOLDER = '/home/cate/audio_inbox'
+BUSY_MESSAGE = b'\x01'
+OK_MESSAGE = b'\x00'
 
 # Auto-detected from hostname
 hostname = socket.gethostname()

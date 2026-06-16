@@ -2,12 +2,9 @@ import socket
 import threading
 import time
 
-from config import CHUNK_SIZE, NUMBER_OF_STATIONS
+from config import CHUNK_SIZE, NUMBER_OF_STATIONS, BUSY_MESSAGE, OK_MESSAGE
 from wav_parser import parse_wav_header, read_header
 from audio_player import AudioPlayer
-
-BUSY_MESSAGE = b'\x01'
-OK_MESSAGE = b'\x00'
 
 class AudioServer:
     def __init__(self, ip_address, tcp_port, playback_state):
