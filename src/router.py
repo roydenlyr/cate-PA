@@ -8,8 +8,9 @@ from wav_parser import is_valid_wav
 
 
 class Router:
-    def __init__(self):
+    def __init__(self, playback_state):
         self.sender = AudioSender()
+        self.playback_state = playback_state
 
     def _parse_target(self, filepath):
         """Extract target from filename. E.g. 'S1.wav' -> 'S1', 'Broadcast.wav' -> 'BROADCAST'"""
@@ -19,10 +20,16 @@ class Router:
 
     def _play_local(self, filepath):
         """Play WAV file through 3.5mm jack using aplay."""
+        if not self.playback_state.try_acquire():
+            print(f"Busy - cannot play {os.path.basename(filepath)} locally.")
+            return
+
         try:
             subprocess.run(['aplay', filepath], check=True)
         except Exception as e:
             print(f"Local playback error: {e}")
+        finally:
+            self.playback_state.release()
 
     def _send_to_station(self, station_id, filepath):
         """Send WAV file to a specific station."""
