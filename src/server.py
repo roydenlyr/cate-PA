@@ -2,18 +2,15 @@ import socket
 import threading
 import time
 
-from config import CHUNK_SIZE, NUMBER_OF_STATIONS
+from config import CHUNK_SIZE, NUMBER_OF_STATIONS, BUSY_MESSAGE, OK_MESSAGE
 from wav_parser import parse_wav_header, read_header
 from audio_player import AudioPlayer
 
-BUSY_MESSAGE = b'\x01'
-OK_MESSAGE = b'\x00'
-
 class AudioServer:
-    def __init__(self, ip_address, tcp_port):
+    def __init__(self, ip_address, tcp_port, playback_state):
         self.ip_address = ip_address
         self.tcp_port = tcp_port
-        self.is_playing = False
+        self.playback_state = playback_state
 
     def start(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,13 +31,12 @@ class AudioServer:
     def handle_client(self, client_socket, addr):
         print(f"Connection from {addr} has been established.")
 
-        if self.is_playing:
+        if not self.playback_state.try_acquire():
             print(f"Busy - rejecting connection from {addr}.")
             client_socket.sendall(BUSY_MESSAGE)
             client_socket.close()
             return
 
-        self.is_playing = True
         client_socket.sendall(OK_MESSAGE)
 
         try:
@@ -57,5 +53,5 @@ class AudioServer:
             time.sleep(0.5)  # Ensure all audio is played before closing
             audio_player.close()
         finally:
-            self.is_playing = False
+            self.playback_state.release()
             client_socket.close()

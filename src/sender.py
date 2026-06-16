@@ -1,6 +1,6 @@
 import time
 import socket
-from config import CHUNK_SIZE
+from config import CHUNK_SIZE, OK_MESSAGE
 
 class AudioSender:
     def send_file(self, target_ip, filepath):
@@ -12,7 +12,7 @@ class AudioSender:
             s.connect(target_ip)
 
             response = s.recv(1)
-            if response != b'\x00':
+            if response != OK_MESSAGE:
                 print(f"Target {target_ip} is busy. Rejecting audio transmission...")
                 s.close()
                 return
