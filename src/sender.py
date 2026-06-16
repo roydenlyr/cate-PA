@@ -11,6 +11,12 @@ class AudioSender:
             s.settimeout(5)
             s.connect(target_ip)
 
+            response = s.recv(1)
+            if response != b'\x00':
+                print(f"Target {target_ip} is busy. Rejecting audio transmission...")
+                s.close()
+                return
+
             with open(filepath, 'rb') as f:
                 header = f.read(44)
                 s.sendall(header)
