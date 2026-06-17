@@ -1,5 +1,6 @@
 import os
 import tempfile
+import threading
 from flask import Flask, request, jsonify
 
 from config import STATION_ID, STATIONS
@@ -31,6 +32,9 @@ class HTTPServer:
             if not audio:
                 return jsonify({'status': 'error', 'message': 'Missing audio file'}), 400
             
+            if self.playback_state.is_playing:
+                return jsonify({'status': 'busy', 'message': f'{STATION_ID} is currently playing'})
+            
             # Save to temp file
             temp_fd, temp_path = tempfile.mkstemp(suffix='.wav')
             os.close(temp_fd)
@@ -43,15 +47,15 @@ class HTTPServer:
                     return jsonify({'status': 'error', 'message': 'Invalid WAV file'}), 400
                 
             # Route the audio
-            result = self.router.handle_request(temp_path, target)
+            def background_task():
+                self.router.handle_request(temp_path, target)
+                try:
+                    os.remove(temp_path)
+                except OSError:
+                    pass
 
-            # Cleanup
-            try:
-                os.remove(temp_path)
-            except OSError:
-                pass
-
-            return jsonify(result)
+            threading.Thread(target=background_task, daemon=True).start()
+            return jsonify({'status': 'error', 'message': f'Routing to {target}'})
         
         @self.app.route('/stations', methods=['GET'])
         def list_stations():
