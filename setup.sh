@@ -14,7 +14,7 @@ echo "========================================="
 # ---- System Packages ----
 echo "[1/9] Installing system packages..."
 sudo apt update -qq
-sudo apt install samba git vim -y -qq
+sudo apt install samba git vim python3-flask -y -qq
 
 # ---- Enable VNC ----
 echo "[2/9] Enabling VNC server..."
