@@ -23,6 +23,18 @@ class Router:
             return {'status': 'error', 'message': f'Local playback error: {e}'}
         finally:
             self.playback_state.release()
+        
+    def _play_local_background(self, file_data):
+        """Play from memory in background. Lock already held, released when done."""
+        try:
+            proc = subprocess.Popen(['aplay', '-'], stdin=subprocess.PIPE)
+            proc.stdin.write(file_data)
+            proc.stdin.close()
+            proc.wait()
+        except Exception as e:
+            print(f"Local playback error: {e}")
+        finally:
+            self.playback_state.release()
 
     def _send_to_station(self, station_id, filepath):
         """Send WAV file to a specific station."""
@@ -38,13 +50,21 @@ class Router:
             threads = []
             results = {}
 
-            def play_local():
-                results['local'] = self._play_local(filepath)
+            if not self.playback_state.try_acquire():
+                results['local'] = {'status': 'busy', 'message': f'{STATION_ID} is currently playing'}
+            else:
+                results['local'] = {'status': 'ok', 'message': f'{STATION_ID} accepted'}
+                with open(filepath, 'rb') as f:
+                    file_data = f.read()
+                threading.Thread(
+                    target=self._play_local_background,
+                    args=(file_data,),
+                    daemon=True
+                ).start()
 
             def send_to(sid):
                 results[sid] = self._send_to_station(sid, filepath)
 
-            threads.append(threading.Thread(target=play_local))
             for station_id in STATIONS:
                 if station_id != STATION_ID:
                     threads.append(threading.Thread(target=send_to, args=(station_id,)))
