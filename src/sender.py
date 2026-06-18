@@ -16,6 +16,8 @@ class AudioSender:
             if response != OK_MESSAGE:
                 s.close()
                 return {'status': 'busy', 'message': f'Target {target_ip} is busy'}
+            
+            s.settimeout(None)
 
             with open(filepath, 'rb') as f:
                 file_data = f.read()
