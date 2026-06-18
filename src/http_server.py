@@ -1,6 +1,5 @@
 import os
 import tempfile
-import threading
 from flask import Flask, request, jsonify
 
 from config import STATION_ID, STATIONS
