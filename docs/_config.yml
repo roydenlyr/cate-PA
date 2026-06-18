@@ -1,2 +1,7 @@
 theme: jekyll-theme-cayman
 title: CATE PA System - Setup Guide
+
+header_pages:
+  - index.md
+  - SETUP.md
+  - API.md

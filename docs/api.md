@@ -1,3 +1,6 @@
+---
+title: API
+---
 # PA Audio System — API Reference
 
 Base URL: `http://<station-ip>:5000`
