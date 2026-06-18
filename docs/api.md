@@ -187,15 +187,15 @@ Used internally between stations for audio streaming. Not intended for direct us
 ```
 Sender                          Receiver
   |                                |
-  |  ---- TCP connect ----------> |
+  |  ---- TCP connect ---------->  |
   |                                |  Check playback state
-  |  <--- 0x00 (OK) ------------ |  (or 0x01 if busy)
+  |  <--- 0x00 (OK) -------------  |  (or 0x01 if busy)
   |                                |
-  |  ---- WAV header (44 B) ---> |  Parse sample rate, channels, bit depth
-  |  ---- audio chunks --------> |  Pipe to aplay
-  |  ---- audio chunks --------> |
-  |  ...                          |
-  |  ---- close connection -----> |  Playback ends
+  |  ---- WAV header (44 B) ---->  |  Parse sample rate, channels, bit depth
+  |  ---- audio chunks --------->  |  Pipe to aplay
+  |  ---- audio chunks --------->  |
+  |  ...                           |
+  |  ---- close connection ----->  |  Playback ends
 ```
 
 | Byte     | Meaning                           |
