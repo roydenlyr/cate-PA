@@ -3,7 +3,6 @@
 set -e
 
 PROJECT_DIR="/home/cate/cate-PA"
-AUDIO_INBOX="/home/cate/audio_inbox"
 SERVICE_NAME="pa-audio"
 REPO_URL="https://github.com/roydenlyr/cate-PA.git"
 
@@ -12,16 +11,16 @@ echo "PA Audio System - Setup"
 echo "========================================="
 
 # ---- System Packages ----
-echo "[1/9] Installing system packages..."
+echo "[1/7] Installing system packages..."
 sudo apt update -qq
 sudo apt install git vim python3-flask -y -qq
 
 # ---- Enable VNC ----
-echo "[2/9] Enabling VNC server..."
+echo "[2/7] Enabling VNC server..."
 sudo raspi-config nonint do_vnc 0
 
 # ---- Auto-detect headphone audio card ----
-echo "[3/9] Configuring audio card..."
+echo "[3/7] Configuring audio card..."
 CARD_NUM=$(aplay -l 2>/dev/null | grep -i headphones | head -1 | sed 's/card \([0-9]\+\):.*/\1/')
 
 if [ -z "$CARD_NUM" ]; then
@@ -35,39 +34,8 @@ defaults.pcm.card $CARD_NUM
 defaults.ctl.card $CARD_NUM
 EOF"
 
-# ---- Audio inbox folder ----
-echo "[4/9] Setting up audio inbox folder..."
-mkdir -p "$AUDIO_INBOX"
-sudo chmod 777 "$AUDIO_INBOX"
-
-# ---- Samba config (only add if not already configured) ----
-echo "[5/9] Configuring Samba..."
-if ! grep -q "\[audio_inbox\]" /etc/samba/smb.conf; then
-    sudo bash -c "cat >> /etc/samba/smb.conf << EOF
-
-[audio_inbox]
-    path = $AUDIO_INBOX
-    browseable = yes
-    writable = yes
-    guest ok = yes
-    create mask = 0777
-EOF"
-    echo "Samba share added"
-else
-    echo "Samba share already configured, skipping."
-fi
-
-# Add map to guest if not present
-if ! grep -q "map to guest" /etc/samba/smb.conf; then
-    sudo sed -i '/\[global\]/a\\    map to guest = bad user' /etc/samba/smb.conf
-    echo "Added guest mapping."
-fi
-
-sudo systemctl restart smbd
-sudo systemctl enable smbd
-
 # ---- Clone project repo ----
-echo "[6/9] Setting up project repository..."
+echo "[4/7] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
@@ -79,7 +47,7 @@ else
 fi
 
 # ---- Fetch config script ----
-echo "[7/9] Setting up config fetch script..."
+echo "[5/7] Setting up config fetch script..."
 cat > "$PROJECT_DIR/fetch_config.sh" << 'FETCHEOF'
 #!/bin/bash
 FS1_IP="128.127.1.50"
@@ -103,7 +71,7 @@ FETCHEOF
 chmod +x "$PROJECT_DIR/fetch_config.sh"
 
 # ---- SSH key for passwordless config fetch ----
-echo "[8/9] Setting up SSH key for config fetch..."
+echo "[6/7] Setting up SSH key for config fetch..."
 if [ ! -f /home/cate/.ssh/id_ed25519 ]; then
     ssh-keygen -t ed25519 -f /home/cate/.ssh/id_ed25519 -N ""
     echo "SSH key generated."
@@ -112,7 +80,7 @@ else
 fi
 
 # ---- Systemd service (only add if not already present) ----
-echo "[9/9] Setting up auto-start service..."
+echo "[7/7] Setting up auto-start service..."
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=PA Audio Server
@@ -152,14 +120,11 @@ echo "Hostname:      $(hostname)"
 echo "Station ID:    Auto-detected from hostname"
 echo "Audio card:    $CARD_NUM"
 echo "Project:       $PROJECT_DIR"
-echo "Audio inbox:   $AUDIO_INBOX"
-echo "Samba share:   \\\\$(hostname -I | awk '{print $1}')\\audio_inbox"
 echo "Service:       $SERVICE_NAME"
 echo ""
 echo "Remaining manual steps:"
-echo "  1. Set Samba password:     sudo smbpasswd -a cate"
-echo "  2. Copy SSH key to FS1:    ssh-copy-id cate@128.127.1.50"
-echo "  3. Verify stations.json is correct on FS1"
-echo "  4. Start service:          sudo systemctl start $SERVICE_NAME"
+echo "  1. Copy SSH key to FS1:    ssh-copy-id cate@128.127.1.50"
+echo "  2. Verify stations.json is correct on FS1"
+echo "  3. Start service:          sudo systemctl start $SERVICE_NAME"
 echo "     Or reboot:              sudo reboot"
 echo "========================================="
