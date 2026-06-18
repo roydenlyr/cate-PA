@@ -1,6 +1,3 @@
----
-title: Home
----
 # PA Audio System
 
 A multi-station audio broadcast system built on Raspberry Pi. Each station can receive, play, and forward WAV audio over the local network.
