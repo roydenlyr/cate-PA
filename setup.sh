@@ -14,7 +14,7 @@ echo "========================================="
 # ---- System Packages ----
 echo "[1/9] Installing system packages..."
 sudo apt update -qq
-sudo apt install samba git vim -y -qq
+sudo apt install samba git vim python3-flask -y -qq
 
 # ---- Enable VNC ----
 echo "[2/9] Enabling VNC server..."
@@ -40,32 +40,8 @@ echo "[4/9] Setting up audio inbox folder..."
 mkdir -p "$AUDIO_INBOX"
 sudo chmod 777 "$AUDIO_INBOX"
 
-# ---- Fetch config script ----
-echo "[5/9] Setting up config fetch script..."
-cat > "$PROJECT_DIR/fetch_config.sh" << 'FETCHEOF'
-#!/bin/bash
-FS1_IP="128.127.1.50"
-LOCAL_CONFIG="/home/cate/cate-PA/src/stations.json"
-HOSTNAME=$(hostname)
-
-# FS1 is the source of truth, no need to fetch from itself
-if echo "$HOSTNAME" | grep -qi "fs1"; then
-    echo "This is FS1, skipping config fetch."
-    exit 0
-fi
-
-scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@${FS1_IP}:/home/cate/cate-PA/src/stations.json "$LOCAL_CONFIG" 2>/dev/null
-
-if [ $? -eq 0 ]; then
-    echo "Updated stations.json from FS1."
-else
-    echo "Could not reach FS1, using existing stations.json."
-fi
-FETCHEOF
-chmod +x "$PROJECT_DIR/fetch_config.sh"
-
 # ---- Samba config (only add if not already configured) ----
-echo "[6/9] Configuring Samba..."
+echo "[5/9] Configuring Samba..."
 if ! grep -q "\[audio_inbox\]" /etc/samba/smb.conf; then
     sudo bash -c "cat >> /etc/samba/smb.conf << EOF
 
@@ -91,7 +67,7 @@ sudo systemctl restart smbd
 sudo systemctl enable smbd
 
 # ---- Clone project repo ----
-echo "[7/9] Setting up project repository..."
+echo "[6/9] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
@@ -101,6 +77,30 @@ else
     cd "$(dirname "$PROJECT_DIR")"
     git clone "$REPO_URL" "$(basename "$PROJECT_DIR")"
 fi
+
+# ---- Fetch config script ----
+echo "[7/9] Setting up config fetch script..."
+cat > "$PROJECT_DIR/fetch_config.sh" << 'FETCHEOF'
+#!/bin/bash
+FS1_IP="128.127.1.50"
+LOCAL_CONFIG="/home/cate/cate-PA/src/stations.json"
+HOSTNAME=$(hostname)
+
+# FS1 is the source of truth, no need to fetch from itself
+if echo "$HOSTNAME" | grep -qi "fs1"; then
+    echo "This is FS1, skipping config fetch."
+    exit 0
+fi
+
+scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@${FS1_IP}:/home/cate/cate-PA/src/stations.json "$LOCAL_CONFIG" 2>/dev/null
+
+if [ $? -eq 0 ]; then
+    echo "Updated stations.json from FS1."
+else
+    echo "Could not reach FS1, using existing stations.json."
+fi
+FETCHEOF
+chmod +x "$PROJECT_DIR/fetch_config.sh"
 
 # ---- SSH key for passwordless config fetch ----
 echo "[8/9] Setting up SSH key for config fetch..."
@@ -113,8 +113,7 @@ fi
 
 # ---- Systemd service (only add if not already present) ----
 echo "[9/9] Setting up auto-start service..."
-sudo bash -c "cat > /etc/systemd/system/${SERVICE_NAME}.service << EOF"
-
+sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=PA Audio Server
 After=network.target sound.target
@@ -130,7 +129,7 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-EOF"
+EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable "${SERVICE_NAME}.service"

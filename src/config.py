@@ -4,9 +4,11 @@ import os
 
 # Fixed - never change
 TCP_PORT = 8080
+HTTP_PORT = 5000
 IP_ADDRESS = '0.0.0.0'
 CHUNK_SIZE = 32768
 WATCH_FOLDER = '/home/cate/audio_inbox'
+
 BUSY_MESSAGE = b'\x01'
 OK_MESSAGE = b'\x00'
 

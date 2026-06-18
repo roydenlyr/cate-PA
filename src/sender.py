@@ -1,5 +1,6 @@
 import time
 import socket
+import threading
 from config import CHUNK_SIZE, OK_MESSAGE
 
 class AudioSender:
@@ -13,22 +14,23 @@ class AudioSender:
 
             response = s.recv(1)
             if response != OK_MESSAGE:
-                print(f"Target {target_ip} is busy. Rejecting audio transmission...")
                 s.close()
-                return
+                return {'status': 'busy', 'message': f'Target {target_ip} is busy'}
 
             with open(filepath, 'rb') as f:
-                header = f.read(44)
-                s.sendall(header)
-                
-                data = f.read(CHUNK_SIZE)
-
-                while data:
-                    s.sendall(data)
-                    data = f.read(CHUNK_SIZE)
-
-            time.sleep(0.5)
-            s.close()
-            print(f"File '{filepath}' sent successfully to {target_ip}")
+                file_data = f.read()
+            
+            def stream():
+                try:
+                    s.sendall(file_data)
+                    time.sleep(0.5)
+                except Exception as e:
+                    print(f"Streaming error to {target_ip}: {e}")
+                finally:
+                    s.close()
+            
+            threading.Thread(target=stream, daemon=True).start()
+            return {'status': 'ok', 'message': f'Sent to {target_ip}'}
+        
         except Exception as e:
-            print(f"Error sending file '{filepath}' to {target_ip}: - {e}")
+            return {'status': 'error', 'message': f'Failed to send to {target_ip}: {e}'}
