@@ -41,6 +41,7 @@ Upon completing all of the steps above, select **Write** to start flashing the O
 
 Insert the microSD card into the Raspberry Pi and connect the power supply. There are 2 LED indicators on the Raspberry Pi (beside power supply port).
 > Solid Green: Raspberry Pi is booting up
+
 > Slow Flashing Green: Raspberry Pi is running
 
 1. Connect the monitor, keyboard and mouse to the Raspberry Pi.
@@ -49,9 +50,9 @@ Insert the microSD card into the Raspberry Pi and connect the power supply. Ther
 
 ### Script Downloading
 ---
-Before proceeding to the next steps, ensure Wi-Fi is connected.
+Before proceeding to the next step, ensure Wi-Fi is connected.
 
-Open terminal (top left corner) and run this command:
+Open terminal (top left corner) and run these commands:
 ```
 git clone https://github.com/roydenlyr/cate-PA.git
 cd cate-PA
@@ -60,9 +61,9 @@ chmod +x setup.sh
 ```
 ``setup.sh`` is a shell script that will install all relevant resources required for the system to run. This process will take a while (~5 min).
 
-Once the script has completed, you will be asked to set up a password for the network folder. Run this command:
+Once the script has completed running, you will be asked to set up an SSH key. Run this command:
 ```
-sudo smbpasswd -a cate
+ssh-copy-id cate@128.127.1.50
 ```
 
 > Note: the command *sudo* gives user elevated privilege. Terminal may prompt you for the password. This is the password you have configured under [CUSTOMISATION (point 3)](#customisation)
