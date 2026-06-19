@@ -22,7 +22,7 @@ Install [Raspberry Pi Imager](https://www.raspberrypi.com/software/) if you have
 
 
 #### Customisation
-1. Under **Hostname**, name the Pi in accordance to this format: cate-PA-{*Station Name Abbreviation*}
+1. Under **Hostname**, name the Pi in accordance to this format: cate-PA-{*Station Name Abbreviation*}.
     >Example: For Fire Station 1, hostname will be **cate-PA-FS1**
 2. Under **Localisation**, ensure settings are as follows:
    1. Capital City: **Singapore**
@@ -45,7 +45,7 @@ Insert the microSD card into the Raspberry Pi and connect the power supply. Ther
 > Slow Flashing Green: Raspberry Pi is running
 
 1. Connect the monitor, keyboard and mouse to the Raspberry Pi.
-2. Once the Desktop is shown on the monitor, check for Wi-Fi connection (top right corner)
+2. Once the Desktop is shown on the monitor, check for Wi-Fi connection (top right corner).
 > NOTE: Connect to Wi-Fi if not connected
 
 ### Script Downloading
@@ -61,46 +61,82 @@ chmod +x setup.sh
 ```
 ``setup.sh`` is a shell script that will install all relevant resources required for the system to run. This process will take a while (~5 min).
 
-Once the script has completed running, you will be asked to set up an SSH key. Run this command:
+> NOTE: The command *sudo* is used in ``setup.sh`` and gives user elevated privilege. Terminal may prompt you for the password. This is the password you have configured under [CUSTOMISATION (point 3)](#customisation).
+
+Once the script has completed running, you should see this message displayed in the terminal:
 ```
-ssh-copy-id cate@128.127.1.50
+Remaining manual steps (on deployment ground):
+    1. Copy SSH key to FS1:    ssh-copy-id cate@128.127.1.50
+    2. Verify stations.json is correct on FS1
+    3. Start service:          sudo systemctl start pa-audio
+        Or reboot:             sudo reboot
 ```
 
-> Note: the command *sudo* gives user elevated privilege. Terminal may prompt you for the password. This is the password you have configured under [CUSTOMISATION (point 3)](#customisation)
+### Setting Static IP
+---
+After `setup.sh` completes, configure the static IP for the deployment network:
 
-You will be prompted to enter a password. **Password should conform to CATE standard**.
-> NOTE: When entering the password into terminal, password will not be shown. Press ENTER once you have keyed in the password. You will be required to enter the password again.
+1. On the Desktop, **right-click** the network icon (top-right corner of the taskbar).
+2. Select **Advanced Options** → **Edit Connections**.
+![image0](../images/image0.png)
+1. Double click **netplan-eth0**.
+![image1](../images/image1.png)
+1. Go to the **IPv4 Settings** tab.
+2. Change **Method** from `Automatic (DHCP)` to **Manual**.
+3. Under **Addresses**, click **Add** and enter:
+   - **Address**: The station's IP (e.g. `128.127.2.50`)
+   - **Netmask**: `255.255.0.0`
+   - **Gateway**: The network gateway (e.g. `128.127.2.1`)
+
+![image2](../images/image2.png)
+7. Click **Save** and close the window.
+
+This will take effect when the LAN cable is plugged in onsite.
+
+Setting up of Raspberry Pi is almost done. The remaining configurations will have to be carried out on-site after connecting to the local network.
 
 ### Station Configuration
 ---
-To configure the Raspberry Pi, you will have to make changes to the configuration file ``config.py``
+The following steps will have to be performed on-site where the Raspberry Pi is connected to the local network.
+> NOTE: Before continuing, ensure that the Raspberry Pi is powered on and the LAN cable has been plugged in.
 
-1. From Desktop, open **Files** (top right corner).
-2. Open **cate-PA &rarr; src &rarr; ``config.py``**
 
-There are 7 variables within ``config.py``. You should only change these 3 variables:
-- STATION_ID
-- NUMBER_OF_STATIONS
-- STATIONS
-
-``STATION_ID`` refers to the station where the current Raspberry Pi will operate. It should follow the same abbreviation given in [hostname](#customisation).
-> Example: Given hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA'
-
-``NUMBER_OF_STATIONS`` refers to the total number of Raspberry Pi being deployed, including the one you are setting up right now. Update this value accordingly.
-
-``STATIONS`` provides a list of IP address of all stations in the format:
+1. Once the Raspberry Pi is within the network, SSH into the Raspberry Pi:
 ```
-'{STATION_ID}': ('{IP ADDRESS}', TCP_PORT),
+ssh cate@IP_ADDRESS
 ```
-Add all existing stations accordingly.
-> REMINDER: Always add the last **comma** from the command shown above.
+where ``IP_ADDRESS`` is the IP address of the Raspberry Pi. You will be prompted to enter the password.
 
-> WARNING: Ensure there are no typo errors in the configuration file.
+Once you have successfully SSH, run this command:
+```
+ssh-copy-id cate@128.127.1.50
+```
+1. Using VNC software, access FS1 (128.127.1.50).
+   1. From Desktop, open **Files** (top left corner)
+   2. Open **cate-PA &rarr; src &rarr; ``stations.json``**
+
+``stations.json`` provides a list of IP address of all stations in the format:
+```
+{
+    "{STATION_ID}": "{IP ADDRESS}",
+    "{STATION_ID}": "{IP ADDRESS}",
+    "{STATION_ID}": "{IP ADDRESS}"
+}
+```
+
+Update the list in ``stations.json`` to include the newly configured Raspberry Pi.
+
+``STATION_ID`` should follow the same abbreviation given in [hostname](#customisation).
+> EXAMPLE: Given the hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA-'.
+
+> REMINDER: Always add the **comma ( , )** at the end of each line as shown in the list above **EXCEPT** the last line.
+
+> WARNING: Ensure there are no typo errors in the file.
 
 Once completed, press ``CTRL + S`` to save the file and close the window.
 
 ### Reboot
-The Raspberry Pi configuration and set up is now complete. Reboot the system for all changes to take effect. To reboot:
+The Raspberry Pi configuration and set up is now complete. Reboot **all stations** Raspberry Pi for changes to take effect. To reboot:
 ```
 sudo reboot
 ```
