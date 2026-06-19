@@ -14,6 +14,9 @@ What you need:
 ### Raspberry Pi Imager
 Install [Raspberry Pi Imager](https://www.raspberrypi.com/software/) if you have not done so.
 
+### VNC Viewer
+Install [VNC Viewer](https://www.realvnc.com/en/connect/download/viewer/?lai_sr=5-9&lai_sl=l) if you have not done so.
+
 ### Flashing OS into Raspberry Pi Board
 1. Insert the microSD card into your computer and launch **rpi-imager.exe**.
 2. Under **Device**, select the correct Raspberry Pi Model (**Raspberry Pi 3**).
@@ -93,11 +96,11 @@ After `setup.sh` completes, configure the static IP for the deployment network:
 
 This will take effect when the LAN cable is plugged in onsite.
 
-Setting up of Raspberry Pi is almost done. The remaining configurations will have to be carried out on-site after connecting to the local network.
+Setting up of Raspberry Pi is almost done. The remaining configurations will have to be carried out onsite after connecting to the local network.
 
 ### Station Configuration
 ---
-The following steps will have to be performed on-site where the Raspberry Pi is connected to the local network.
+The following steps will have to be performed onsite where the Raspberry Pi is connected to the local network.
 > NOTE: Before continuing, ensure that the Raspberry Pi is powered on and the LAN cable has been plugged in.
 
 
@@ -111,7 +114,14 @@ Once you have successfully SSH, run this command:
 ```
 ssh-copy-id cate@128.127.1.50
 ```
-2. Using VNC software, access FS1 (128.127.1.50).
+2. Using [VNC software](#vnc-viewer), access **FS1 (128.127.1.50)**.
+   1. Open Terminal in VNC and run this command:
+```
+ssh-copy-id@IP_ADDRESS
+```
+where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you have configured. Once completed, you can close the terminal but keep VNC open.
+
+3. While still in VNC:
    1. From Desktop, open **Files** (top left corner)
    2. Open **cate-PA &rarr; src &rarr; ``stations.json``**
 
@@ -136,7 +146,14 @@ Update the list in ``stations.json`` to include the newly configured Raspberry P
 Once completed, press ``CTRL + S`` to save the file and close the window.
 
 ### Reboot
-The Raspberry Pi configuration and set up is now complete. Reboot **all stations** Raspberry Pi for changes to take effect. To reboot:
+The Raspberry Pi configuration and set up is now complete. Reboot **all stations except FS1** for changes to take effect. 
+To reboot, either SSH into FS1 **OR** using VNC and open Terminal and run this command: 
 ```
-sudo reboot
+cd ~/cate-PA/scripts
+./reboot_all.sh
 ```
+
+This will remotely reboot all stations except FS1. 
+> NOTE: Do **not** reboot FS1. FS1 is the reference point for all stations and does not need to be rebooted.
+
+Once completed,  you should see the message ``all stations rebooted``.
