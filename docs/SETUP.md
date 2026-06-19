@@ -146,7 +146,9 @@ Update the list in ``stations.json`` to include the newly configured Raspberry P
 Once completed, press ``CTRL + S`` to save the file and close the window.
 
 ### Reboot
-The Raspberry Pi configuration and set up is now complete. Reboot **all stations except FS1** for changes to take effect. 
+The Raspberry Pi configuration and set up is now complete. Reboot **all stations except FS1** for changes to take effect.
+> IMPORTANT: Notify all stations' watchroom before rebooting. Rebooting will temporarily disable the PA system. However, IVCS will still be operational.
+
 To reboot, either SSH into FS1 **OR** using VNC and open Terminal and run this command: 
 ```
 cd ~/cate-PA/scripts
