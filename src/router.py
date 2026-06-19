@@ -27,8 +27,16 @@ class Router:
 
     def _broadcast(self, filepath):
         results = {}
-        results['local'] = self._play_local(filepath)
-        self._broadcast_remote(results, filepath)
+        threads = [
+            threading.Thread(target=lambda: results.update({'local': self._play_local(filepath)})),
+            threading.Thread(target=lambda: self._broadcast_remote(results, filepath))
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+            
         return {'status': 'ok', 'message': 'Broadcast complete', 'details': results}
 
     def _broadcast_remote(self, results, filepath):
