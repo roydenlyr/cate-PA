@@ -48,27 +48,7 @@ fi
 
 # ---- Fetch config script ----
 echo "[5/7] Setting up config fetch script..."
-cat > "$PROJECT_DIR/fetch_config.sh" << 'FETCHEOF'
-#!/bin/bash
-FS1_IP="128.127.1.50"
-LOCAL_CONFIG="/home/cate/cate-PA/src/stations.json"
-HOSTNAME=$(hostname)
-
-# FS1 is the source of truth, no need to fetch from itself
-if echo "$HOSTNAME" | grep -qi "fs1"; then
-    echo "This is FS1, skipping config fetch."
-    exit 0
-fi
-
-scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@${FS1_IP}:/home/cate/cate-PA/src/stations.json "$LOCAL_CONFIG" 2>/dev/null
-
-if [ $? -eq 0 ]; then
-    echo "Updated stations.json from FS1."
-else
-    echo "Could not reach FS1, using existing stations.json."
-fi
-FETCHEOF
-chmod +x "$PROJECT_DIR/fetch_config.sh"
+chmod +x "$PROJECT_DIR/scripts/fetch_config.sh"
 
 # ---- SSH key for passwordless config fetch ----
 echo "[6/7] Setting up SSH key for config fetch..."

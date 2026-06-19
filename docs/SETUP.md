@@ -55,7 +55,7 @@ Before proceeding to the next step, ensure Wi-Fi is connected.
 Open terminal (top left corner) and run these commands:
 ```
 git clone https://github.com/roydenlyr/cate-PA.git
-cd cate-PA
+cd cate-PA/scripts
 chmod +x setup.sh
 ./setup.sh
 ```
