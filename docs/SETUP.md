@@ -115,7 +115,8 @@ Once you have successfully SSH, run this command:
 ssh-copy-id cate@128.127.1.50
 ```
 2. Using [VNC software](#vnc-viewer), access **FS1 (128.127.1.50)**.
-   1. Open Terminal in VNC and run this command:
+   1. Open Terminal through VNC and run this command:
+
 ```
 ssh-copy-id@IP_ADDRESS
 ```
