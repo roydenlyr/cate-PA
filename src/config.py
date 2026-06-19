@@ -11,6 +11,9 @@ CHUNK_SIZE = 32768
 BUSY_MESSAGE = b'\x01'
 OK_MESSAGE = b'\x00'
 
+REPEAT = 2
+DELAY = 1
+
 # Auto-detected from hostname
 hostname = socket.gethostname()
 STATION_ID = hostname.split('-')[-1].upper()  # Extract station ID from hostname (e.g., 'FS1', 'WS')

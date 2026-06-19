@@ -1,7 +1,7 @@
 import os
 import threading
 
-from config import STATION_ID, STATIONS
+from config import STATION_ID, STATIONS, REPEAT, DELAY
 from sender import AudioSender
 from audio_player import AudioPlayer
 
@@ -9,12 +9,10 @@ from audio_player import AudioPlayer
 class Router:
     """Routes audio to local playback or remote stations."""
 
-    REPEAT = 2
-
     def __init__(self, playback_state):
         self.sender = AudioSender()
         self.playback_state = playback_state
-        self.player = AudioPlayer(repeat=self.REPEAT)
+        self.player = AudioPlayer(repeat=REPEAT, delay=DELAY)
 
     def handle_request(self, filepath, target):
         """Route audio to the correct destination."""

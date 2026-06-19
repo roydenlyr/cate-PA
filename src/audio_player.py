@@ -1,24 +1,30 @@
 import subprocess
+import time
 
 
 class AudioPlayer:
     """Handles all local audio playback through aplay."""
 
-    def __init__(self, repeat=1):
+    def __init__(self, repeat=1, delay=1.0):
         self.repeat = repeat
+        self.delay = delay
 
     def play_file(self, filepath):
         """Play a WAV file from disk (blocking)."""
-        for _ in range(self.repeat):
+        for i in range(self.repeat):
             subprocess.run(['aplay', filepath], check=True)
+            if i < self.repeat - 1:
+                time.sleep(self.delay) 
 
     def play_data(self, data):
         """Play raw WAV data from memory (blocking)."""
-        for _ in range(self.repeat):
+        for i in range(self.repeat):
             proc = subprocess.Popen(['aplay', '-'], stdin=subprocess.PIPE)
             proc.stdin.write(data)
             proc.stdin.close()
             proc.wait()
+            if i < self.repeat - 1:
+                time.sleep(self.delay)
 
     def play_stream(self, channels, sample_rate, bits_per_sample):
         """Return a StreamPlayer for chunk-by-chunk playback."""

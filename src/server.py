@@ -1,22 +1,20 @@
 import socket
 import threading
-import time
 
 from config import CHUNK_SIZE, NUMBER_OF_STATIONS, BUSY_MESSAGE, OK_MESSAGE
-from wav_parser import parse_wav_header, read_header
+from wav_parser import read_header
 from audio_player import AudioPlayer
+from config import REPEAT, DELAY
 
 
 class AudioServer:
     """TCP server that receives audio from other stations and plays it."""
 
-    REPEAT = 2
-
     def __init__(self, ip_address, tcp_port, playback_state):
         self.ip_address = ip_address
         self.tcp_port = tcp_port
         self.playback_state = playback_state
-        self.player = AudioPlayer(repeat=self.REPEAT)
+        self.player = AudioPlayer(repeat=REPEAT, delay=DELAY)
 
     def start(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
