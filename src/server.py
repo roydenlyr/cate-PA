@@ -6,11 +6,17 @@ from config import CHUNK_SIZE, NUMBER_OF_STATIONS, BUSY_MESSAGE, OK_MESSAGE
 from wav_parser import parse_wav_header, read_header
 from audio_player import AudioPlayer
 
+
 class AudioServer:
+    """TCP server that receives audio from other stations and plays it."""
+
+    REPEAT = 2
+
     def __init__(self, ip_address, tcp_port, playback_state):
         self.ip_address = ip_address
         self.tcp_port = tcp_port
         self.playback_state = playback_state
+        self.player = AudioPlayer(repeat=self.REPEAT)
 
     def start(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,18 +27,17 @@ class AudioServer:
         try:
             while True:
                 client_socket, addr = self.s.accept()
-                client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
-                client_thread.start()
-
+                threading.Thread(target=self._handle_client, args=(client_socket, addr)).start()
         except KeyboardInterrupt:
             print("Shutting down server...")
             self.s.close()
 
-    def handle_client(self, client_socket, addr):
-        print(f"Connection from {addr} has been established.")
+    def _handle_client(self, client_socket, addr):
+        """Accept or reject connection, receive audio, play it."""
+        print(f"Connection from {addr}")
 
         if not self.playback_state.try_acquire():
-            print(f"Busy - rejecting connection from {addr}.")
+            print(f"Busy - rejecting {addr}")
             client_socket.sendall(BUSY_MESSAGE)
             client_socket.close()
             return
@@ -40,18 +45,21 @@ class AudioServer:
         client_socket.sendall(OK_MESSAGE)
 
         try:
-            header = read_header(client_socket)
-            channels, sample_rate, bits_per_sample = parse_wav_header(header)
-            audio_player = AudioPlayer(channels, sample_rate, bits_per_sample)
-
-            while True:
-                data = client_socket.recv(CHUNK_SIZE)
-                if not data:
-                    break
-                audio_player.play(data)
-
-            time.sleep(0.5)  # Ensure all audio is played before closing
-            audio_player.close()
+            audio_data = self._receive_audio(client_socket)
+            self.player.play_data(audio_data)
         finally:
             self.playback_state.release()
             client_socket.close()
+
+    def _receive_audio(self, client_socket):
+        """Buffer all incoming audio data and return as bytes."""
+        header = read_header(client_socket)
+        chunks = [header]
+
+        while True:
+            data = client_socket.recv(CHUNK_SIZE)
+            if not data:
+                break
+            chunks.append(data)
+
+        return b''.join(chunks)

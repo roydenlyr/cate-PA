@@ -1,16 +1,45 @@
 import subprocess
+
+
 class AudioPlayer:
+    """Handles all local audio playback through aplay."""
+
+    def __init__(self, repeat=1):
+        self.repeat = repeat
+
+    def play_file(self, filepath):
+        """Play a WAV file from disk (blocking)."""
+        for _ in range(self.repeat):
+            subprocess.run(['aplay', filepath], check=True)
+
+    def play_data(self, data):
+        """Play raw WAV data from memory (blocking)."""
+        for _ in range(self.repeat):
+            proc = subprocess.Popen(['aplay', '-'], stdin=subprocess.PIPE)
+            proc.stdin.write(data)
+            proc.stdin.close()
+            proc.wait()
+
+    def play_stream(self, channels, sample_rate, bits_per_sample):
+        """Return a StreamPlayer for chunk-by-chunk playback."""
+        return StreamPlayer(channels, sample_rate, bits_per_sample)
+
+
+class StreamPlayer:
+    """Plays audio chunks as they arrive over TCP."""
+
+    FORMAT_MAP = {8: 'U8', 16: 'S16_LE', 24: 'S24_LE', 32: 'S32_LE'}
+
     def __init__(self, channels, sample_rate, bits_per_sample):
-        format_map = {8: 'U8', 16: 'S16_LE', 24: 'S24_LE', 32: 'S32_LE'}
         self.process = subprocess.Popen(
-            ['aplay', '-f', format_map[bits_per_sample],
+            ['aplay', '-f', self.FORMAT_MAP[bits_per_sample],
              '-r', str(sample_rate),
              '-c', str(channels),
              '-'],
             stdin=subprocess.PIPE
         )
 
-    def play(self, data):
+    def write(self, data):
         self.process.stdin.write(data)
 
     def close(self):

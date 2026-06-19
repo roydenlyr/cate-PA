@@ -3,36 +3,52 @@ import socket
 import threading
 from config import CHUNK_SIZE, OK_MESSAGE
 
-class AudioSender:
-    def send_file(self, target_ip, filepath):
-        """Sends a WAV file to the specified target IP address over TCP."""
 
+class AudioSender:
+    """Handles sending audio to remote stations over TCP."""
+
+    def send_file(self, target_addr, filepath):
+        """Connect, check accept/busy, stream in background. Returns immediately."""
+        sock, status = self._connect(target_addr)
+        if sock is None:
+            return status
+
+        file_data = self._read_file(filepath)
+        self._stream_background(sock, file_data, target_addr)
+        return {'status': 'ok', 'message': f'Accepted by {target_addr}'}
+
+    def _connect(self, target_addr):
+        """Establish TCP connection and check if station is free."""
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(5)
-            s.connect(target_ip)
+            s.connect(target_addr)
 
             response = s.recv(1)
             if response != OK_MESSAGE:
                 s.close()
-                return {'status': 'busy', 'message': f'Target {target_ip} is busy'}
-            
-            s.settimeout(None)
+                return None, {'status': 'busy', 'message': f'Target {target_addr} is busy'}
 
-            with open(filepath, 'rb') as f:
-                file_data = f.read()
-            
-            def stream():
-                try:
-                    s.sendall(file_data)
-                    time.sleep(0.5)
-                except Exception as e:
-                    print(f"Streaming error to {target_ip}: {e}")
-                finally:
-                    s.close()
-            
-            threading.Thread(target=stream, daemon=True).start()
-            return {'status': 'ok', 'message': f'Sent to {target_ip}'}
-        
+            s.settimeout(None)
+            return s, None
+
         except Exception as e:
-            return {'status': 'error', 'message': f'Failed to send to {target_ip}: {e}'}
+            return None, {'status': 'error', 'message': f'Failed to connect to {target_addr}: {e}'}
+
+    def _read_file(self, filepath):
+        """Read entire file into memory."""
+        with open(filepath, 'rb') as f:
+            return f.read()
+
+    def _stream_background(self, sock, file_data, target_addr):
+        """Stream audio data in a background thread."""
+        def stream():
+            try:
+                sock.sendall(file_data)
+                time.sleep(0.5)
+            except Exception as e:
+                print(f"Streaming error to {target_addr}: {e}")
+            finally:
+                sock.close()
+
+        threading.Thread(target=stream, daemon=True).start()
