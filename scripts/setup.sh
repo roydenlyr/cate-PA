@@ -49,6 +49,7 @@ fi
 # ---- Fetch config script ----
 echo "[5/7] Setting up config fetch script..."
 chmod +x "$PROJECT_DIR/scripts/fetch_config.sh"
+chmod +x "$PROJECT_DIR/scripts/reboot_all.sh"
 
 # ---- SSH key for passwordless config fetch ----
 echo "[6/7] Setting up SSH key for config fetch..."
