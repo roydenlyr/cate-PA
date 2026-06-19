@@ -78,17 +78,17 @@ After `setup.sh` completes, configure the static IP for the deployment network:
 
 1. On the Desktop, **right-click** the network icon (top-right corner of the taskbar).
 2. Select **Advanced Options** → **Edit Connections**.
-![image0](../images/image0.png)
-1. Double click **netplan-eth0**.
-![image1](../images/image1.png)
-1. Go to the **IPv4 Settings** tab.
-2. Change **Method** from `Automatic (DHCP)` to **Manual**.
-3. Under **Addresses**, click **Add** and enter:
+![image0](images/image0.png)
+3. Double click **netplan-eth0**.
+![image1](images/image1.png)
+4. Go to the **IPv4 Settings** tab.
+5. Change **Method** from `Automatic (DHCP)` to **Manual**.
+6. Under **Addresses**, click **Add** and enter:
    - **Address**: The station's IP (e.g. `128.127.2.50`)
    - **Netmask**: `255.255.0.0`
    - **Gateway**: The network gateway (e.g. `128.127.2.1`)
 
-![image2](../images/image2.png)
+![image2](images/image2.png)
 7. Click **Save** and close the window.
 
 This will take effect when the LAN cable is plugged in onsite.
@@ -111,7 +111,7 @@ Once you have successfully SSH, run this command:
 ```
 ssh-copy-id cate@128.127.1.50
 ```
-1. Using VNC software, access FS1 (128.127.1.50).
+2. Using VNC software, access FS1 (128.127.1.50).
    1. From Desktop, open **Files** (top left corner)
    2. Open **cate-PA &rarr; src &rarr; ``stations.json``**
 
