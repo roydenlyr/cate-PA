@@ -118,7 +118,7 @@ ssh-copy-id cate@128.127.1.50
    1. Open Terminal through VNC and run this command:
 
 ```
-ssh-copy-id@IP_ADDRESS
+ssh-copy-id cate@IP_ADDRESS
 ```
 where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you have configured. Once completed, you can close the terminal but keep VNC open.
 
