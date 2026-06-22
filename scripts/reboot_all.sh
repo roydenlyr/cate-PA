@@ -1,5 +1,6 @@
 #!/bin/bash
-FS1_IP="128.127.1.50"
+CONFIG="/home/cate/cate-PA/src/stations.json"
+FS1_IP=$(python3 -c "import json; print(json.load(open('$CONFIG'))['FS1'])")
 SELF_IP=$(hostname -I | awk '{print $1}')
 
 if [ "$SELF_IP" != "$FS1_IP" ]; then

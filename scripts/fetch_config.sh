@@ -1,5 +1,4 @@
 #!/bin/bash
-FS1_IP="128.127.1.50"
 LOCAL_CONFIG="/home/cate/cate-PA/src/stations.json"
 HOSTNAME=$(hostname)
 
@@ -7,6 +6,8 @@ if echo "$HOSTNAME" | grep -qi "fs1"; then
     echo "This is FS1, skipping config fetch."
     exit 0
 fi
+
+FS1_IP=$(python3 -c "import json; print(json.load(open('$LOCAL_CONFIG'))['FS1'])")
 
 scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@${FS1_IP}:/home/cate/cate-PA/src/stations.json "$LOCAL_CONFIG" 2>/dev/null
 
