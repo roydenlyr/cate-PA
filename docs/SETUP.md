@@ -111,15 +111,15 @@ where ``IP_ADDRESS`` is the IP address of the Raspberry Pi. You will be prompted
 
 Once you have successfully SSH, run this command:
 ```
-ssh-copy-id cate@128.127.1.50
+ssh-copy-id cate@{FS1 IP Address}
 ```
-2. Using [VNC software](#vnc-viewer), access **FS1**.
+2. Using [VNC software](#vnc-viewer) on your laptop, access **FS1**.
    1. Open Terminal through VNC and run this command:
 
 ```
 ssh-copy-id cate@IP_ADDRESS
 ```
-where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you have configured. Once completed, you can close the terminal but keep VNC open.
+where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you are configuring. Once completed, you can close the terminal but keep VNC open.
 
 3. While still in VNC:
    1. From Desktop, open **Files** (top left corner)
@@ -137,7 +137,7 @@ where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you have configured. 
 Update the list in ``stations.json`` to include the newly configured Raspberry Pi.
 
 ``STATION_ID`` should follow the same abbreviation given in [hostname](#customisation).
-> EXAMPLE: Given the hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA-'.
+> EXAMPLE: Given the hostname cate-PA-FS1, STATION_ID = FS1. Do **NOT** include 'cate-PA-'.
 
 > REMINDER: Always add the **comma ( , )** at the end of each line as shown in the list above **EXCEPT** the last line.
 
@@ -149,7 +149,7 @@ Once completed, press ``CTRL + S`` to save the file and close the window.
 The Raspberry Pi configuration and set up is now complete. Reboot **all stations except FS1** for changes to take effect.
 > IMPORTANT: Notify all stations' watchroom before rebooting. Rebooting will temporarily disable the PA system. However, IVCS will still be operational.
 
-To reboot, either SSH into FS1 **OR** using VNC and open Terminal and run this command: 
+To reboot, either SSH into FS1 **OR** using VNC to open Terminal and run this command: 
 ```
 cd ~/cate-PA/scripts
 ./reboot_all.sh
