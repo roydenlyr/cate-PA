@@ -26,16 +26,14 @@ Install [VNC Viewer](https://www.realvnc.com/en/connect/download/viewer/?lai_sr=
 
 #### Customisation
 1. Under **Hostname**, name the Pi in accordance to this format: cate-PA-{*Station Name Abbreviation*}.
-    > [!TIP]
-    > Example: For Fire Station 1, hostname will be **cate-PA-FS1**
+    >Example: For Fire Station 1, hostname will be **cate-PA-FS1**
 2. Under **Localisation**, ensure settings are as follows:
    1. Capital City: **Singapore**
    2. Time Zone: **Asia/Singapore**
    3. Keyboard Layout: **us**
 3.  Under **User**, username and password should align with CATE's standard.
 4.  Under **Wi-Fi**, enter the SSID and credentials for the network you are currently in.
-    > [!NOTE]
-    > Ensure you have stable internet connection.
+    > NOTE: Ensure you have stable internet connection.
 5. Under **Remote Access**, select **enable SSH** and choose **use password authentication** as the *Authentication Mechanism*.
 6. Under **Raspberry Pi Connect**, do not enable this feature.
 
@@ -45,15 +43,13 @@ Upon completing all of the steps above, select **Write** to start flashing the O
 ---
 
 Insert the microSD card into the Raspberry Pi and connect the power supply. There are 2 LED indicators on the Raspberry Pi (beside power supply port).
-> [!TIP]
 > Solid Green: Raspberry Pi is booting up
-> 
+
 > Slow Flashing Green: Raspberry Pi is running
 
 1. Connect the monitor, keyboard and mouse to the Raspberry Pi.
 2. Once the Desktop is shown on the monitor, check for Wi-Fi connection (top right corner).
-> [!NOTE]
-> Connect to Wi-Fi if not connected
+> NOTE: Connect to Wi-Fi if not connected
 
 ### Script Downloading
 ---
@@ -68,8 +64,7 @@ chmod +x setup.sh
 ```
 ``setup.sh`` is a shell script that will install all relevant resources required for the system to run. This process will take a while (~5 min).
 
-> [!NOTE]
-> The command *sudo* is used in ``setup.sh`` and gives user elevated privilege. Terminal may prompt you for the password. This is the password you have configured under [CUSTOMISATION (point 3)](#customisation).
+> NOTE: The command *sudo* is used in ``setup.sh`` and gives user elevated privilege. Terminal may prompt you for the password. This is the password you have configured under [CUSTOMISATION (point 3)](#customisation).
 
 Once the script has completed running, you should see this message displayed in the terminal:
 ```
@@ -106,8 +101,7 @@ Setting up of Raspberry Pi is almost done. The remaining configurations will hav
 ### Station Configuration
 ---
 The following steps will have to be performed onsite where the Raspberry Pi is connected to the local network.
-> [!NOTE]
-> Before continuing, ensure that the Raspberry Pi is powered on and the LAN cable has been plugged in.
+> NOTE: Before continuing, ensure that the Raspberry Pi is powered on and the LAN cable has been plugged in.
 
 
 1. Once the Raspberry Pi is within the network, SSH into the Raspberry Pi:
@@ -144,21 +138,17 @@ where ``IP_ADDRESS`` is the IP address of the Raspberry Pi you have configured. 
 Update the list in ``stations.json`` to include the newly configured Raspberry Pi.
 
 ``STATION_ID`` should follow the same abbreviation given in [hostname](#customisation).
-> [!TIP]
-> Given the hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA-'.
+> EXAMPLE: Given the hostname cate-PA-FS1, STATION_ID = FS1. Do not include 'cate-PA-'.
 
-> [!NOTE]
-> Always add the **comma ( , )** at the end of each line as shown in the list above **EXCEPT** the last line.
+> REMINDER: Always add the **comma ( , )** at the end of each line as shown in the list above **EXCEPT** the last line.
 
-> [!WARNING]
-> Ensure there are no typo errors in the file.
+> WARNING: Ensure there are no typo errors in the file.
 
 Once completed, press ``CTRL + S`` to save the file and close the window.
 
 ### Reboot
 The Raspberry Pi configuration and set up is now complete. Reboot **all stations except FS1** for changes to take effect.
-> [!IMPORTANT]
-> **Notify all stations' watchroom before rebooting**. Rebooting will temporarily disable the PA system. However, **IVCS will still be operational**.
+> IMPORTANT: Notify all stations' watchroom before rebooting. Rebooting will temporarily disable the PA system. However, IVCS will still be operational.
 
 To reboot, either SSH into FS1 **OR** using VNC and open Terminal and run this command: 
 ```
@@ -167,7 +157,6 @@ cd ~/cate-PA/scripts
 ```
 
 This will remotely reboot all stations except FS1. 
-> [!NOTE]
-> Do **not** reboot FS1. FS1 is the reference point for all stations and does not need to be rebooted.
+> NOTE: Do **not** reboot FS1. FS1 is the reference point for all stations and does not need to be rebooted.
 
 Once completed,  you should see the message ``all stations rebooted``.
