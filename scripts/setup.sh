@@ -11,16 +11,16 @@ echo "PA Audio System - Setup"
 echo "========================================="
 
 # ---- System Packages ----
-echo "[1/7] Installing system packages..."
+echo "[1/8] Installing system packages..."
 sudo apt update -qq
 sudo apt install git vim python3-flask -y -qq
 
 # ---- Enable VNC ----
-echo "[2/7] Enabling VNC server..."
+echo "[2/8] Enabling VNC server..."
 sudo raspi-config nonint do_vnc 0
 
 # ---- Auto-detect headphone audio card ----
-echo "[3/7] Configuring audio card..."
+echo "[3/8] Configuring audio card..."
 CARD_NUM=$(aplay -l 2>/dev/null | grep -i headphones | head -1 | sed 's/card \([0-9]\+\):.*/\1/')
 
 if [ -z "$CARD_NUM" ]; then
@@ -35,7 +35,7 @@ defaults.ctl.card $CARD_NUM
 EOF"
 
 # ---- Clone project repo ----
-echo "[4/7] Setting up project repository..."
+echo "[4/8] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
@@ -46,13 +46,25 @@ else
     git clone "$REPO_URL" "$(basename "$PROJECT_DIR")"
 fi
 
+# ---- Configure FS1 ----
+echo "[5/8] Configuring FS1 IP..."
+CONFIG_FILE="$PROJECT_DIR/src/stations.json"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    read -p "Enter FS1 IP address: " FS1_IP
+    echo "{\"FS1\": \"$FS1_IP\"}" > "$CONFIG_FILE"
+    echo "Created stations.json with FS1 IP."
+else
+    echo "stations.json already exists, skipping."
+fi
+
 # ---- Fetch config script ----
-echo "[5/7] Setting up config fetch script..."
+echo "[6/8] Setting up config fetch script..."
 chmod +x "$PROJECT_DIR/scripts/fetch_config.sh"
 chmod +x "$PROJECT_DIR/scripts/reboot_all.sh"
 
 # ---- SSH key for passwordless config fetch ----
-echo "[6/7] Setting up SSH key for config fetch..."
+echo "[7/8] Setting up SSH key for config fetch..."
 if [ ! -f /home/cate/.ssh/id_ed25519 ]; then
     ssh-keygen -t ed25519 -f /home/cate/.ssh/id_ed25519 -N ""
     echo "SSH key generated."
@@ -61,7 +73,7 @@ else
 fi
 
 # ---- Systemd service (only add if not already present) ----
-echo "[7/7] Setting up auto-start service..."
+echo "[8/8] Setting up auto-start service..."
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=PA Audio Server
