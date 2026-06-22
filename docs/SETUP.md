@@ -69,7 +69,7 @@ chmod +x setup.sh
 Once the script has completed running, you should see this message displayed in the terminal:
 ```
 Remaining manual steps (on deployment ground):
-    1. Copy SSH key to FS1:    ssh-copy-id cate@128.127.1.50
+    1. Copy SSH key to FS1:    ssh-copy-id cate@{FS1 IP Address}
     2. Verify stations.json is correct on FS1
     3. Start service:          sudo systemctl start pa-audio
         Or reboot:             sudo reboot
@@ -87,12 +87,11 @@ After `setup.sh` completes, configure the static IP for the deployment network:
 4. Go to the **IPv4 Settings** tab.
 5. Change **Method** from `Automatic (DHCP)` to **Manual**.
 6. Under **Addresses**, click **Add** and enter:
-   - **Address**: The station's IP (e.g. `128.127.2.50`)
-   - **Netmask**: `255.255.0.0`
-   - **Gateway**: The network gateway (e.g. `128.127.2.1`)
-
-![image2](images/image2.png)
+   - **Address**: The station's IP
+   - **Netmask**: The network netmask
+   - **Gateway**: The network gateway
 7. Click **Save** and close the window.
+![image2](images/image2.png)
 
 This will take effect when the LAN cable is plugged in onsite.
 
@@ -114,7 +113,7 @@ Once you have successfully SSH, run this command:
 ```
 ssh-copy-id cate@128.127.1.50
 ```
-2. Using [VNC software](#vnc-viewer), access **FS1 (128.127.1.50)**.
+2. Using [VNC software](#vnc-viewer), access **FS1**.
    1. Open Terminal through VNC and run this command:
 
 ```
