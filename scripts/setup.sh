@@ -77,7 +77,8 @@ echo "[8/9] Setting up auto-start service..."
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=PA Audio Server
-After=network.target sound.target
+After=network-online.target sound.target
+Wants=network-online.target
 
 [Service]
 Type=simple

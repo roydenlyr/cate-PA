@@ -9,6 +9,8 @@ fi
 
 FS1_IP=$(python3 -c "import json; print(json.load(open('$LOCAL_CONFIG'))['FS1'])")
 
+sleep 5
+
 scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@${FS1_IP}:/home/cate/cate-PA/src/stations.json "$LOCAL_CONFIG" 2>/dev/null
 
 if [ $? -eq 0 ]; then
