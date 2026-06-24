@@ -11,7 +11,7 @@ fi
 for ip in $(python3 -c "import json; [print(ip) for ip in json.load(open('/home/cate/cate-PA/src/stations.json')).values()]"); do
     if [ "$ip" != "$FS1_IP" ]; then
         echo "Rebooting $ip..."
-        ssh -o ConnectTimeout=5 cate@$ip "sudo reboot" &
+        ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no cate@$ip "sudo reboot" &
     fi
 done
 
