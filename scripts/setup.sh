@@ -44,12 +44,15 @@ echo "[5/10] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
-    git pull
+    git fetch --all
+    git reset --hard origin/main
 else
     echo "Cloning project repository..."
     cd "$(dirname "$PROJECT_DIR")"
     git clone "$REPO_URL" "$(basename "$PROJECT_DIR")"
 fi
+
+rm -rf "$PROJECT_DIR/docs"
 
 # ---- Configure FS1 ----
 echo "[6/10] Configuring FS1 IP..."
