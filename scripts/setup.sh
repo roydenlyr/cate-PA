@@ -93,6 +93,7 @@ Type=simple
 User=cate
 WorkingDirectory=${PROJECT_DIR}/src
 ExecStartPre=/bin/bash ${PROJECT_DIR}/scripts/fetch_config.sh
+ExecStartPre=/usr/bin/amixer -c ${CARD_NUM} set PCM 100%% unmute
 ExecStart=/usr/bin/python3 main.py
 Restart=always
 RestartSec=5
