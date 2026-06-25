@@ -11,16 +11,16 @@ echo "PA Audio System - Setup"
 echo "========================================="
 
 # ---- System Packages ----
-echo "[1/9] Installing system packages..."
+echo "[1/10] Installing system packages..."
 sudo apt update -qq
 sudo apt install git vim python3-flask -y -qq
 
 # ---- Enable VNC ----
-echo "[2/9] Enabling VNC server..."
+echo "[2/10] Enabling VNC server..."
 sudo raspi-config nonint do_vnc 0
 
 # ---- Auto-detect headphone audio card ----
-echo "[3/9] Configuring audio card..."
+echo "[3/10] Configuring audio card..."
 CARD_NUM=$(aplay -l 2>/dev/null | grep -i headphones | head -1 | sed 's/card \([0-9]\+\):.*/\1/')
 
 if [ -z "$CARD_NUM" ]; then
@@ -34,8 +34,13 @@ defaults.pcm.card $CARD_NUM
 defaults.ctl.card $CARD_NUM
 EOF"
 
+# ---- Max Volume ----
+echo "[4/10] Maxing audio volume..."
+amixer -c $CARD_NUM set PCM 100% unmute 2>/dev/null || true
+sudo alsactl store
+
 # ---- Clone project repo ----
-echo "[4/9] Setting up project repository..."
+echo "[5/10] Setting up project repository..."
 if [ -d "$PROJECT_DIR" ]; then
     echo "Project directory already exists. Pulling latest changes..."
     cd "$PROJECT_DIR"
@@ -47,7 +52,7 @@ else
 fi
 
 # ---- Configure FS1 ----
-echo "[5/9] Configuring FS1 IP..."
+echo "[6/10] Configuring FS1 IP..."
 CONFIG_FILE="$PROJECT_DIR/src/stations.json"
 
 if [ ! -f "$CONFIG_FILE" ]; then
@@ -59,12 +64,12 @@ else
 fi
 
 # ---- Fetch config script ----
-echo "[6/9] Setting up config fetch script..."
+echo "[7/10] Setting up config fetch script..."
 chmod +x "$PROJECT_DIR/scripts/fetch_config.sh"
 chmod +x "$PROJECT_DIR/scripts/reboot_all.sh"
 
 # ---- SSH key for passwordless config fetch ----
-echo "[7/9] Setting up SSH key for config fetch..."
+echo "[8/10] Setting up SSH key for config fetch..."
 if [ ! -f /home/cate/.ssh/id_ed25519 ]; then
     ssh-keygen -t ed25519 -f /home/cate/.ssh/id_ed25519 -N ""
     echo "SSH key generated."
@@ -73,7 +78,7 @@ else
 fi
 
 # ---- Systemd service (only add if not already present) ----
-echo "[8/9] Setting up auto-start service..."
+echo "[9/10] Setting up auto-start service..."
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=PA Audio Server
@@ -97,7 +102,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable "${SERVICE_NAME}.service"
 
 # ---- Passwordless reboot ----
-echo "[9/9] Configuring remote reboot access..."
+echo "[10/10] Configuring remote reboot access..."
 echo "cate ALL=(ALL) NOPASSWD: /sbin/reboot" | sudo tee /etc/sudoers.d/reboot-nopasswd > /dev/null
 
 # ---- Test audio ----
