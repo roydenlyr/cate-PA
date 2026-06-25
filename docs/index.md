@@ -4,5 +4,5 @@ A multi-station audio broadcast system built on Raspberry Pi. Each station can r
 
 ## Documentation
 
-- [Setup Guide](SETUP) — Installation and configuration for each Pi
-- [API Reference](API) — HTTP endpoints and TCP protocol
+- [Setup Guide](setup.md) — Installation and configuration for each Pi
+- [API Reference](api-reference.md) — HTTP endpoints and TCP protocol
