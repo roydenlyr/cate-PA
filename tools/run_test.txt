@@ -1,0 +1,1 @@
+python3 ~/cate-PA/tools/pa_test_tool.py
